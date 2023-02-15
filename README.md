@@ -1,4 +1,4 @@
-# RL-score-timestamps
+# Rocket League Score Timestamps
 
 ## Description
  
