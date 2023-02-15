@@ -2,7 +2,7 @@
 
 ## Description
  
-Extract timestamps from a video of rocket league gameplay whenever the user's team scores a goal, then output them into a text file.
+Extract timestamps from a video of rocket league gameplay whenever the user's team scores a goal, then output them into a text file. Also works for twitch vods.
 
 ## Limitations
 
