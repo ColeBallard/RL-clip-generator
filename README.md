@@ -22,9 +22,11 @@ git clone https://github.com/ColeBallard/RL-score-timestamps
 
 2. Install the latest version of python. [Downloads.](https://www.python.org/downloads/)
 
-3. Run the 'run.bat' file.
+3. Run the 'install.bat' file. **You only have to do this once.**
 
-4. Select your mp4 files.
+4. Run the 'run.bat' file.
+
+5. Select your mp4 files.
 
 ## Contribution
 
