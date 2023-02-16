@@ -118,7 +118,7 @@ def makeClip(video_file, time):
     cap.release()
 
     # Set the start and end times of the desired portion of the video
-    start_time = time - 15  # in seconds
+    start_time = time - 10  # in seconds
     end_time = time + 10   # in seconds
 
     if start_time < 0:
