@@ -2,7 +2,7 @@
 
 ## Description
  
-Extract timestamps from a video of rocket league gameplay whenever the user's team scores a goal, then generates clips based off the timestamp. Also works for twitch vods.
+Extract timestamps from a video of rocket league gameplay whenever the user's team scores a goal, then generates a clip based off the timestamp. Also works for twitch vods.
 
 ## Limitations
 
