@@ -2,9 +2,9 @@ import os
 import cv2
 import numpy as np
 import tensorflow as tf
-from datetime import timedelta
 import tkinter as tk
 from tkinter import filedialog
+from moviepy.video.io.VideoFileClip import VideoFileClip
 
 def invertFrame(frame):
     # Convert to HSV
@@ -108,13 +108,37 @@ def determineScoreChange(prev_score, score, game, consec_entries):
 
     return changed, game, consec_entries
 
+def makeClip(video_file, time):
+    # Load the video
+    cap = cv2.VideoCapture(video_file) 
+
+    # Get the frame count
+    frame_count = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
+
+    cap.release()
+
+    # Set the start and end times of the desired portion of the video
+    start_time = time - 15  # in seconds
+    end_time = time + 10   # in seconds
+
+    if start_time < 0:
+        start_time = 0
+
+    if end_time > int(frame_count / 60):
+        end_time = int(frame_count / 60)
+
+    # Load the video
+    video = VideoFileClip(video_file)
+
+    # Trim the video
+    trimmed_video = video.subclip(start_time, end_time)
+
+    # Save the trimmed video
+    trimmed_video.write_videofile(f'clips/{os.path.basename(video_file)[:-4]}_{time}.mp4')
+
 def identifyScores(video):
     # Load the video
-    # cap = cv2.VideoCapture(r'C:\Users\coleb\dev\RL-score-timestamps\input\test2.mp4') # In-game only
-
-    # cap = cv2.VideoCapture(r'C:\Users\coleb\dev\RL-score-timestamps\input\20230128_pyyrosRL_1721499439.mp4') # Entire stream
-
-    cap = cv2.VideoCapture(video) # Entire stream
+    cap = cv2.VideoCapture(video)
 
     # Get the frame count
     frame_count = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
@@ -146,7 +170,7 @@ def identifyScores(video):
         if game == True and changed == True:
             sec = int(i / 60) - 5
             
-            timestamps.append(str(timedelta(seconds=sec)))
+            timestamps.append(sec)
         
         prev_score = score
 
@@ -157,11 +181,11 @@ def identifyScores(video):
     # Release the video
     cap.release()
 
-    with open(f'timestamps/{os.path.basename(video)[:-4]}.txt', 'w') as f:
-        for timestamp in timestamps:
-            f.write(timestamp + "\n")
+    
+    for timestamp in timestamps:
+        makeClip(video, timestamp)
 
-        print(f'Successfully located {len(timestamps)} timestamps and outputted to timestamps/{os.path.basename(video)[:-4]}.txt')
+    print(f'Finished clipping {video}.')
 
 # Create a GUI window
 root = tk.Tk()

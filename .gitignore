@@ -130,3 +130,6 @@ dmypy.json
 
 /input
 /scores
+
+/clips
+!/clips/README.md
