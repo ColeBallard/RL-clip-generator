@@ -1,14 +1,14 @@
-# Rocket League Score Timestamps
+# Rocket League Clip Generator
 
 ## Description
  
-Extract timestamps from a video of rocket league gameplay whenever the user's team scores a goal, then output them into a text file. Also works for twitch vods.
+Extract timestamps from a video of rocket league gameplay whenever the user's team scores a goal, then generates clips based off the timestamp. Also works for twitch vods.
 
 ## Limitations
 
 This application currently only successfully proccesses **1280x720 60fps mp4** videos. Any other resolution, fps, or file type will not work.
 
-Only works for up to 9 goals per game. Timestamps will not be given for the user's 10th goal and beyond.
+Only works for up to 9 goals per game. Clips will not be generated for the user's 10th goal and beyond.
 
 The application and effectiveness of the model may also be limited by the user's UI scale in the Rocket League settings. I'm not completely sure of this though.
 
