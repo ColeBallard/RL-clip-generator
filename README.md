@@ -6,11 +6,16 @@ Extract timestamps from a video of rocket league gameplay whenever the user's te
 
 ## Limitations
 
-This application currently only successfully proccesses **1280x720 60fps mp4** videos. Any other resolution, fps, or file type will not work.
+This application currently only successfully proccesses **60fps mp4** videos in 3 resolutions: 
+- 1920 x 1080
+- 1920 x 810
+- 1280 x 720
 
-Only works for up to 9 goals per game. Clips will not be generated for the user's 10th goal and beyond.
+Any other resolution, fps, or file type **WILL NOT WORK**.
 
-The application and effectiveness of the model may also be limited by the user's UI scale in the Rocket League settings. I'm not completely sure of this though.
+Only works for up to 9 goals per game. Clips may not be generated for the user's 10th goal and beyond.
+
+The application and effectiveness of the model is also limited by the user's UI scale in their Rocket League settings. I'm currently working on an option where the user can select the gameplay/vods corresponding UI scale.
 
 ## **Usage**
 
