@@ -25,12 +25,19 @@ def invertFrame(frame):
     else:
         return True
 
-def getROI(frame):
+def getROI(frame, width, height):
     # Define the region of interest (ROI)
-    x, y, w, h = 555, 5, 35, 35 # 1280 x 720
+    if width == 1280 and height == 720:
+        x, y, w, h = 555, 5, 35, 35
+    
+    elif width == 1670 and height == 705:
+        x, y, w, h = 752, 4, 35, 35
 
     # Set ROI
     roi = frame[y:y+h, x:x+w]
+
+    # cv2.imshow("ROI", roi)
+    # cv2.waitKey(1)
 
     # Convert to grayscale
     gray = cv2.cvtColor(roi, cv2.COLOR_BGR2GRAY)
@@ -133,12 +140,26 @@ def makeClip(video_file, time):
     # Trim the video
     trimmed_video = video.subclip(start_time, end_time)
 
-    # Save the trimmed video
-    trimmed_video.write_videofile(f'clips/{os.path.basename(video_file)[:-4]}_{time}.mp4')
+    try:
+        output_directory
+    except NameError:
+        # Save the trimmed video
+        trimmed_video.write_videofile(f'clips/{os.path.basename(video_file)[:-4]}_{time}.mp4')
+    else:
+        if output_directory == '':
+            # Save the trimmed video
+            trimmed_video.write_videofile(f'clips/{os.path.basename(video_file)[:-4]}_{time}.mp4')
+        else:
+            # Save the trimmed video
+            trimmed_video.write_videofile(f'{output_directory}/{os.path.basename(video_file)[:-4]}_{time}.mp4')
 
 def identifyScores(video):
     # Load the video
     cap = cv2.VideoCapture(video)
+
+    # Get video resolution
+    width = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
+    height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
 
     # Get the frame count
     frame_count = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
@@ -156,31 +177,72 @@ def identifyScores(video):
 
     print(f'Total frames in video {video}: {frame_count}')
 
-    # Iterate over each 60th frame
-    for i in range(0, frame_count, 60):
-        cap.set(cv2.CAP_PROP_POS_FRAMES, i)
-        ret, frame = cap.read()
+    if width == 1920 and height == 1080:
+        # Iterate over each 60th frame
+        for i in range(0, frame_count, 60):
+            cap.set(cv2.CAP_PROP_POS_FRAMES, i)
+            ret, frame = cap.read()
 
-        roi = getROI(frame)
+            # Converts frame to 1280x720
+            frame = cv2.resize(frame, (1280, 720))
 
-        score = np.argmax(model.predict(np.expand_dims(roi, axis = 0), verbose = 0)[0])
+            roi = getROI(frame, 1280, 720)
 
-        changed, game, consec_entries = determineScoreChange(prev_score, score, game, consec_entries)
+            score = np.argmax(model.predict(np.expand_dims(roi, axis = 0), verbose = 0)[0])
 
-        if game == True and changed == True:
-            sec = int(i / 60) - 5
+            changed, game, consec_entries = determineScoreChange(prev_score, score, game, consec_entries)
+
+            if game == True and changed == True:
+                sec = int(i / 60) - 5
+                
+                timestamps.append(sec)
             
-            timestamps.append(sec)
+            prev_score = score
         
-        prev_score = score
+    elif width == 1920 and height == 810:
+        # Iterate over each 60th frame
+        for i in range(0, frame_count, 60):
+            cap.set(cv2.CAP_PROP_POS_FRAMES, i)
+            ret, frame = cap.read()
 
-        # cv2.imshow("ROI", frame)
-        # if cv2.waitKey(1) == 13:
-        #     break
+            # Converts frame to 1280x540
+            frame = cv2.resize(frame, (1670, 705))
+
+            roi = getROI(frame, 1670, 705)
+
+            score = np.argmax(model.predict(np.expand_dims(roi, axis = 0), verbose = 0)[0])
+
+            changed, game, consec_entries = determineScoreChange(prev_score, score, game, consec_entries)
+
+            if game == True and changed == True:
+                sec = int(i / 60) - 5
+                
+                timestamps.append(sec)
+                print('dis shit works')
+            
+            prev_score = score     
+
+    elif width == 1280 and height == 720:
+        # Iterate over each 60th frame
+        for i in range(0, frame_count, 60):
+            cap.set(cv2.CAP_PROP_POS_FRAMES, i)
+            ret, frame = cap.read()
+
+            roi = getROI(frame, width, height)
+
+            score = np.argmax(model.predict(np.expand_dims(roi, axis = 0), verbose = 0)[0])
+
+            changed, game, consec_entries = determineScoreChange(prev_score, score, game, consec_entries)
+
+            if game == True and changed == True:
+                sec = int(i / 60) - 5
+                
+                timestamps.append(sec)
+            
+            prev_score = score
 
     # Release the video
     cap.release()
-
     
     for timestamp in timestamps:
         makeClip(video, timestamp)
@@ -194,21 +256,88 @@ root = tk.Tk()
 label = tk.Label(root, text="Select one or more mp4 files:")
 label.pack()
 
+valid_files = False
+file_paths = None
+
 # Create a button that allows the user to browse and select files
 def browseFiles():
+    global browse_files_label
+    
+    try:
+        browse_files_label
+    except NameError:
+        browse_files_label = None
+    else:
+        browse_files_label.destroy()
+
+    global valid_files
+    global file_paths
+
     file_paths = filedialog.askopenfilenames()
+
+    if len(file_paths) != 0:
+        valid_files = True
+
     for file_path in file_paths:
         if not file_path.endswith(".mp4"):
             message = f"Error: {file_path} is not an mp4 file."
-            error_label = tk.Label(root, text=message, fg="red")
-            error_label.pack()
+            browse_files_label = tk.Label(root, text=message, fg="red")
+            browse_files_label.pack()
+            valid_files = False
             break
-    else:
-        for video in file_paths:
-            identifyScores(video)
+
+    if valid_files:
+        message = "\n".join(file_paths)
+        browse_files_label = tk.Label(root, text=f'Selected files:\n{message}')
+        browse_files_label.pack()
+
+    return 
 
 browse_button = tk.Button(root, text="Browse", command=browseFiles)
 browse_button.pack()
+
+# Create label for space
+tk.Label(root, text=" ").pack()
+
+# Create a label to display instructions
+label = tk.Label(root, text="Select clip output directory:")
+label.pack()
+
+def select_directory():
+    global select_directory_label
+
+    try:
+        select_directory_label
+    except NameError:
+        select_directory_label = None
+    else:
+        select_directory_label.destroy()
+
+    global output_directory
+    output_directory = filedialog.askdirectory()
+
+    message = output_directory
+    select_directory_label = tk.Label(root, text=f'Output directory:\n{message}')
+    select_directory_label.pack()
+
+select_button = tk.Button(root, text="Select Directory", command=select_directory)
+select_button.pack()
+
+# Create label for space
+tk.Label(root, text=" ").pack()
+
+def submit():
+    if valid_files:
+        for video in file_paths:
+            identifyScores(video)
+
+    else:
+        message = f"Unable to process selected file(s)."
+        error_label = tk.Label(root, text=message, fg="red")
+        error_label.pack()
+
+submit_button = tk.Button(root, text="Generate clips", command=submit)
+submit_button.pack()
 
 # Run the GUI window
 root.mainloop()
