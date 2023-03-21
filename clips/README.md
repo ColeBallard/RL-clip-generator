@@ -1,1 +1,1 @@
-# This is where your clips will be outputted to!
+# This is where your clips will be outputted to locally if you don't select an output directory.
