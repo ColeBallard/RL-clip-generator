@@ -31,7 +31,7 @@ git clone https://github.com/ColeBallard/RL-score-timestamps
 
 4. Run the 'run.bat' file.
 
-5. Select your mp4 files.
+5. Select your mp4 file(s) and output directory, then press 'Generate clips'!
 
 ## Contribution
 
