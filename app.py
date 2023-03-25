@@ -164,6 +164,9 @@ def identifyScores(video):
     # Get the frame count
     frame_count = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
 
+    # Get the FPS of the video
+    fps = cap.get(cv2.CAP_PROP_FPS)
+
     prev_score = None
 
     game = False
@@ -175,7 +178,8 @@ def identifyScores(video):
     # Load digit classifying model
     model = tf.keras.models.load_model('model')
 
-    print(f'Total frames in video {video}: {frame_count}')
+    print(f'Total frames for {video}: {frame_count}')
+    print(f'Frames per second: {fps}')
 
     if width == 1920 and height == 1080:
         # Iterate over each 60th frame
@@ -193,7 +197,7 @@ def identifyScores(video):
             changed, game, consec_entries = determineScoreChange(prev_score, score, game, consec_entries)
 
             if game == True and changed == True:
-                sec = int(i / 60) - 5
+                sec = int(i / fps) - 5
                 
                 timestamps.append(sec)
             
@@ -215,10 +219,9 @@ def identifyScores(video):
             changed, game, consec_entries = determineScoreChange(prev_score, score, game, consec_entries)
 
             if game == True and changed == True:
-                sec = int(i / 60) - 5
+                sec = int(i / fps) - 5
                 
                 timestamps.append(sec)
-                print('dis shit works')
             
             prev_score = score     
 
@@ -235,7 +238,7 @@ def identifyScores(video):
             changed, game, consec_entries = determineScoreChange(prev_score, score, game, consec_entries)
 
             if game == True and changed == True:
-                sec = int(i / 60) - 5
+                sec = int(i / fps) - 5
                 
                 timestamps.append(sec)
             
